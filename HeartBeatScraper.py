@@ -102,7 +102,7 @@ async def send_message_list(index):
         total_instances += data.instances
         total_pph += data.pph
         instances_string = f"{data.instances} Instances" if data.instances > 2 else f"__**{data.instances} Instances**__"
-        line = f"- {data.status} <@{re.sub(r'[-+*:/().,;"!%=]', '', data.user_id)}>: {instances_string} | {data.packs} Packs | {data.hours:02d}:{data.minutes:02d} Hours | {data.pph} Packs/Hours"
+        line = f"- {data.status} <@{re.sub(r'[-+*/:]', '', data.user_id)}>: {instances_string} | {data.packs} Packs | {data.hours:02d}:{data.minutes:02d} Hours | {data.pph} Packs/Hours"
         message_list.append(line)
 
     message_content = (f"**Total: {len(sorted_messages)} Rollers | {total_instances} Instances | {total_packs[index] - previous_total_packs[index]} Packs | {total_pph} Packs/Hours** \n" + "\n".join(message_list))
