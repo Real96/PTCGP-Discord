@@ -80,7 +80,7 @@ async def live(interaction: discord.Interaction):
     embed.set_thumbnail(url=selected_image)
     embed.set_footer(
         text="Free Rerollers",
-        icon_url=bot.user.display_avatar.url if bot.user and bot.user.display_avatar else None
+        icon_url="https://media.discordapp.net/attachments/891642127753285663/1338921127963263026/LOGO.png?format=webp&quality=lossless&width=669&height=669"
     )
     await dedicated_channel.send(content=role_mention, embed=embed)
 
