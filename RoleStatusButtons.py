@@ -13,6 +13,8 @@ role_emojis = config["role_emojis"]
 group_emojis = config["group_emojis"]
 ruby_group_id = config["ruby_group_id"]
 sapphire_group_id = config["sapphire_group_id"]
+image_url = config["image_url"]
+footer_icon_url = config["footer_icon_url"]
 bot_token = config["bot_token"]
 
 intents = discord.Intents.default()
@@ -23,19 +25,14 @@ intents.members = True
 bot = discord.Client(intents=intents)
 
 class RoleButton(Button):
-    def __init__(self, role_name: str, bot):
-        emoji = role_emojis.get(role_name, "")
-        super().__init__(label=f"{role_name}", emoji=emoji, style=discord.ButtonStyle.secondary)
+    def __init__(self, role_name):
+        super().__init__(label=f"{role_name}", emoji=role_emojis[role_name], style=discord.ButtonStyle.secondary)
         self.role_name = role_name
-        self.bot = bot
 
     async def callback(self, interaction: discord.Interaction):
         guild = interaction.guild
         role = guild.get_role(role_ids[self.role_name])
         member = interaction.user
-
-        roles_to_remove = [guild.get_role(r) for r in role_ids.values() if r != role_ids[self.role_name]]
-        await member.remove_roles(*roles_to_remove)
 
         if role in member.roles:
             await interaction.response.send_message(
@@ -43,6 +40,8 @@ class RoleButton(Button):
                 ephemeral=True
             )
         else:
+            current_role = next(r for r in member.roles if r.id in role_ids.values())
+            await member.remove_roles(current_role)
             await member.add_roles(role)
             await interaction.response.send_message(
                 f"{role_emojis[self.role_name]} {self.role_name} assegnato!",
@@ -50,27 +49,30 @@ class RoleButton(Button):
             )
 
 class RoleView(View):
-    def __init__(self, bot):
+    def __init__(self):
         super().__init__(timeout=None)
-        self.bot = bot
 
         for role_name in role_ids.keys():
-            self.add_item(RoleButton(role_name, bot))
+            self.add_item(RoleButton(role_name))
 
 async def count_role_members_by_group(guild):
-    rubino_counts = {key: 0 for key in role_ids.keys()}
-    zaffiro_counts = {key: 0 for key in role_ids.keys()}
-    
+    rubino_counts = {key: 0 for key in role_ids}
+    zaffiro_counts = {key: 0 for key in role_ids}
+
     for member in guild.members:
-        if any(role.id == ruby_group_id for role in member.roles):
-            for role_name, role_id in role_ids.items():
-                if discord.utils.get(member.roles, id=role_id):
-                    rubino_counts[role_name] += 1
-        elif any(role.id == sapphire_group_id for role in member.roles):
-            for role_name, role_id in role_ids.items():
-                if discord.utils.get(member.roles, id=role_id):
-                    zaffiro_counts[role_name] += 1
-    
+        if discord.utils.get(member.roles, id=ruby_group_id):
+            group_counts = rubino_counts
+        elif discord.utils.get(member.roles, id=sapphire_group_id):
+            group_counts = zaffiro_counts
+        else:
+            continue
+
+        member_role_ids = {role.id for role in member.roles}
+
+        for role_name, role_id in role_ids.items():
+            if role_id in member_role_ids:
+                group_counts[role_name] += 1
+
     return rubino_counts, zaffiro_counts
 
 latest_sent_message = None
@@ -101,7 +103,7 @@ async def generate_button_embed(guild):
         ),
         inline=True
     )
-    
+
     embed.add_field(
         name=f"**{group_emojis[1]} Gruppo Zaffiro**",
         value=(
@@ -112,10 +114,10 @@ async def generate_button_embed(guild):
         inline=True
     )
 
-    embed.set_image(url="https://pa1.aminoapps.com/7517/e4090edde65bcc73988fa6ac83bd22f2827e6507r1-500-233_hq.gif")
+    embed.set_image(url=image_url)
     embed.set_footer(
         text="Free Rerollers",
-        icon_url="https://media.discordapp.net/attachments/891642127753285663/1338921127963263026/LOGO.png?format=webp&quality=lossless&width=669&height=669"
+        icon_url=footer_icon_url
     )
     return embed
 
@@ -139,7 +141,7 @@ async def on_ready():
     channel = bot.get_channel(destination_channel_id)
 
     embed = await generate_button_embed(guild)
-    view = RoleView(bot)
+    view = RoleView()
     latest_sent_message = await channel.send(embed=embed, view=view)
 
 bot.run(bot_token)
