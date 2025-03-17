@@ -13,19 +13,13 @@ live_tag_id = config["live_tag_id"]
 testing_tag_id = config["testing_tag_id"]
 dedicated_channel_id = config["dedicated_channel_id"]
 notify_role_id = config["notify_role_id"]
+image_links = config["image_links"]
+footer_icon_url = config["footer_icon_url"]
 
 bot_token = config["bot_token"]
 
 intents = discord.Intents.all()
 bot = commands.Bot(command_prefix="!", intents=intents)
-
-image_links = [
-    "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExNWx1Ym5iNmViZjh2d3VrYmllbjBsbnJ5amg2c3lnM2NlY2VoNnl1dCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/1cQMlSncDxzwc/giphy.gif",
-    "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExbXFtbHgycHdscDF2MmV3dXUwaDQ3NXJjMWUydm8wMXc1MDMxYjY4diZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/tXPAH9cNL91Nm/giphy.gif",
-    "https://media0.giphy.com/media/v1.Y2lkPTc5MGI3NjExZm01Y2JraWt0bjU3ZnFjYnlsZGZjMzltcnlpbDd3eTF1ZWlpOHg5ayZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/TL0h9l7hdotF1O3pCv/giphy.gif",
-    "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExZmthYWg5amVwMHVqejBvanR4NXV6aXM0dGdpZWFrb2FudmxreHJvNyZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/I2nZMy0sI0ySA/giphy.gif",
-    "https://media1.giphy.com/media/v1.Y2lkPTc5MGI3NjExMHNxemw3ZXdzbjZ5cGJ5ZjFvM2Z0ZjFwdWNoNmp6OXhkNzBuMGV5aSZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/3f8sk4CB0RtOU/giphy.gif"
-]
 
 @bot.event
 async def on_ready():
@@ -58,7 +52,7 @@ async def live(interaction: discord.Interaction):
 
     current_tags = thread.applied_tags or []
     filtered_tags = [tag for tag in current_tags if tag.id != testing_tag_id[thread_id]]
-    
+
     if live_tag_obj in filtered_tags:
         await interaction.response.send_message("Il tag *live* è già presente in questo thread.", ephemeral=True)
 
@@ -80,7 +74,7 @@ async def live(interaction: discord.Interaction):
     embed.set_thumbnail(url=selected_image)
     embed.set_footer(
         text="Free Rerollers",
-        icon_url="https://media.discordapp.net/attachments/891642127753285663/1338921127963263026/LOGO.png?format=webp&quality=lossless&width=669&height=669"
+        icon_url=footer_icon_url
     )
     await dedicated_channel.send(content=role_mention, embed=embed)
 
