@@ -80,6 +80,8 @@ async def send_message_list():
 
     for user_id, data in user_messages.items():
         if int(time.time()) - int(data.timestamp.split(":")[1]) <= offline_timer:
+            data.status = get_member_status(user_id)
+
             if data.user_id not in hidden_users and data.status != off_status and data.instances:
                 active_messages[user_id] = data
 
