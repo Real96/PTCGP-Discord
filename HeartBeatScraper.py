@@ -82,7 +82,7 @@ async def send_message_list():
         if int(time.time()) - int(data.timestamp.split(":")[1]) <= offline_timer:
             data.status = get_member_status(user_id)
 
-            if data.user_id not in hidden_users and data.status != off_status and data.instances:
+            if (data.user_id not in hidden_users or data.instances) and data.status != off_status and data.instances:
                 active_messages[user_id] = data
 
     sorted_messages = sorted(active_messages.values(), key=lambda x: (status_order[x.status], -x.instances, -x.hours, -x.minutes))
