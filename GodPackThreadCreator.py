@@ -14,11 +14,12 @@ destination_channel_ids = config["destination_channel_ids"]
 bot_token = config["bot_token"]
 
 message_pattern = re.compile(
-    r"@(?P<user_id>\S+) .*\n"
+    r"@(?P<user_id>\S+).*\n"
     r"(?P<rerolling_name>[\w\d]+)(?: \((?P<ig_user_id>\d*)\))?\n"
-    r"\[(?P<rare_cards>\d/5)]\[(?P<packs>\d+P)](?:\[(?P<booster>[\w\s]+) Booster])?  God pack found in instance: \d+\n"
+    r"\[(?P<rare_cards>\d/5)]\[(?P<packs>\d+P)](?:\[(?P<booster>[^\]]+)\])?\s+God pack found in instance: \d+\n"
     r"File name: (?P<file_name>.+\.xml)\n"
-    r".*"
+    r".*",
+    re.IGNORECASE
 )
 
 intents = discord.Intents.default()
